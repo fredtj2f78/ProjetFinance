@@ -1,2 +1,13 @@
 .vercel
 .env*
+# Dépendances
+node_modules/
+
+# Dossier de build Next.js
+.next/
+out/
+build/
+
+# Fichiers d'environnement (Sécurité des clés API)
+.env
+.env.local
