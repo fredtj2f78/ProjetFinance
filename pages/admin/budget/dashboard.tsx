@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/auth-helpers-nextjs';
 import { Card, Title, BarChart, Subtitle } from '@tremor/react';
 
 export default function Dashboard() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createPagesBrowserClient();
+  
+  // Utilisation du nom de fonction exact réclamé par le compilateur
+  const supabase = createBrowserClient();
 
   useEffect(() => {
     async function fetchStats() {
-      // On appelle la vue SQL magique que nous avons créée !
       const { data: stats, error } = await supabase
         .from('stats_par_compte')
         .select('*');
 
       if (!error && stats) {
-        // Tremor aime bien les nombres positifs pour la hauteur des barres, 
-        // on transforme donc les décaissements (négatifs) en positifs pour le graphique
-        const formattedStats = stats.map(row => ({
+        // Transformation des décaissements (négatifs) en positifs pour l'affichage Tremor
+        const formattedStats = stats.map((row: any) => ({
           ...row,
           total_decaisse_positif: Math.abs(row.total_decaisse)
         }));
@@ -27,7 +27,7 @@ export default function Dashboard() {
     }
 
     fetchStats();
-  }, []);
+  }, [supabase]);
 
   return (
     <div className="max-w-6xl mx-auto p-8">
@@ -46,7 +46,7 @@ export default function Dashboard() {
             index="account_name"
             categories={["total_encaisse", "total_decaisse_positif"]}
             colors={["emerald", "red"]}
-            valueFormatter={(number) => 
+            valueFormatter={(number: number) => 
               Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(number)
             }
           />
