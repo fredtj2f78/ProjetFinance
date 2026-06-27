@@ -1,50 +1,45 @@
-import { useState } from 'react';
-import Papa from 'papaparse';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 
-export default function ImportCSV() {
-  const [status, setStatus] = useState('');
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Méthode non autorisée' });
+  }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const supabase = createPagesServerClient({ req, res });
+  
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    return res.status(401).json({ error: 'Non autorisé' });
+  }
 
-    setStatus('Lecture du fichier...');
+  const { transactions } = req.body;
 
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (results) => {
-        setStatus('Envoi vers la base de données...');
-        
-        try {
-          const response = await fetch('/api/budget/import', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transactions: results.data }),
-          });
+  try {
+    const formattedData = transactions.map((row: any) => {
+      // Nettoyage du montant pour gérer le format français (ex: 1 250,50)
+      const rawAmount = row['Montant'] ? row['Montant'].replace(/\s/g, '').replace(',', '.') : '0';
+      const parsedAmount = parseFloat(rawAmount);
 
-          if (response.ok) {
-            setStatus('Import réussi ! Les données sont dans Supabase.');
-          } else {
-            setStatus('Erreur lors de l\'import.');
-          }
-        } catch (error) {
-          setStatus('Erreur de connexion serveur.');
-        }
-      },
+      return {
+        user_id: session.user.id,
+        bank_transaction_id: `csv_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        account_name: row['Nom du compte'] || 'Compte Inconnu', // Utilise la nouvelle colonne texte
+        date: row['Date'], 
+        amount: isNaN(parsedAmount) ? 0 : parsedAmount,
+        raw_label: row['Libellé'] || '',
+        category: row['Catégorie'] || 'Inconnue',
+      };
     });
-  };
 
-  return (
-    <div className="p-6 max-w-xl mx-auto bg-white rounded-lg shadow-sm border mt-10">
-      <h2 className="text-xl font-bold mb-4">Importer un export Linxo (CSV)</h2>
-      <input 
-        type="file" 
-        accept=".csv" 
-        onChange={handleFileUpload}
-        className="block w-full text-sm text-gray-500 mb-4"
-      />
-      {status && <p className="text-sm font-medium text-gray-700">{status}</p>}
-    </div>
-  );
+    // Insertion groupée dans la table fraîchement créée
+    const { error } = await supabase.from('transactions').insert(formattedData);
+
+    if (error) throw error;
+
+    return res.status(200).json({ success: true, count: formattedData.length });
+  } catch (error) {
+    console.error('Erreur lors de l\'importation :', error);
+    return res.status(500).json({ error: 'Échec de l\'insertion des données' });
+  }
 }
