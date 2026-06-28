@@ -52,8 +52,8 @@ export default function Dashboard() {
         <Title>Flux financiers par compte</Title>
         <Subtitle>Comparaison des encaissements et décaissements sur toute la période</Subtitle>
         
-        {loading ? (
-          <div className="h-72 flex items-center justify-center text-gray-500">Chargement des données...</div>
+        {true ? (
+          <div className="h-72 flex items-center justify-center text-gray-500">loading={String(loading)} | data={data.length} | error={errorDiagnostic || "none"}</div>
         ) : errorDiagnostic ? (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-700 font-mono text-sm">
             <p className="font-bold mb-1">⚠️ Diagnostic du problème :</p>
