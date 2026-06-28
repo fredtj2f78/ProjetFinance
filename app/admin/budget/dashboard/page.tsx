@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/auth-helpers-nextjs';
-import { Card, Title, BarChart, Subtitle } from '@tremor/react';
 
 export default function Dashboard() {
   const [data, setData] = useState<any[]>([]);
@@ -25,7 +24,7 @@ export default function Dashboard() {
           setErrorDiagnostic(`Erreur Supabase : ${error.message}`);
         } else if (stats) {
           if (stats.length === 0) {
-            setErrorDiagnostic("La vue a renvoyé 0 ligne. Vérifiez que vous êtes bien connecté à Audit Immo.");
+            setErrorDiagnostic("La vue a renvoyé 0 ligne. Vérifiez que vous êtes connecté.");
           } else {
             const formattedStats = stats.map((row: any) => ({
               ...row,
@@ -35,7 +34,7 @@ export default function Dashboard() {
           }
         }
       } catch (err: any) {
-        setErrorDiagnostic(`Erreur de code : ${err.message}`);
+        setErrorDiagnostic(`Erreur : ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -46,32 +45,47 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto p-8 bg-gray-50 min-h-screen text-black">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900">Tableau de bord - Audit Immo</h1>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 border-b border-gray-300 pb-4">Tableau de bord - Audit Immo</h1>
       
-      <Card>
-        <Title>Flux financiers par compte</Title>
-        <Subtitle>Comparaison des encaissements et décaissements sur toute la période</Subtitle>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-800">Flux financiers par compte</h2>
+        <p className="text-gray-500 mb-6 text-sm">Comparaison des encaissements et décaissements sur toute la période</p>
         
         {loading ? (
-          <div className="h-72 flex items-center justify-center text-gray-500">Chargement des données...</div>
+          <div className="h-48 flex items-center justify-center text-gray-500">Chargement des données bancaires...</div>
         ) : errorDiagnostic ? (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-700 font-mono text-sm">
-            <p className="font-bold mb-1">⚠️ Diagnostic du problème :</p>
-            <p className="whitespace-pre-wrap">{errorDiagnostic}</p>
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700 font-mono text-sm">
+            ⚠️ {errorDiagnostic}
           </div>
         ) : (
-          <BarChart
-            className="mt-6 h-72"
-            data={data}
-            index="account_name"
-            categories={["total_encaisse", "total_decaisse_positif"]}
-            colors={["emerald", "red"]}
-            valueFormatter={(number: number) => 
-              Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(number)
-            }
-          />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left border-collapse">
+              <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+                <tr>
+                  <th className="px-6 py-4 border-b border-gray-200 font-bold">Compte Bancaire</th>
+                  <th className="px-6 py-4 border-b border-gray-200 font-bold text-right">Total Encaissé</th>
+                  <th className="px-6 py-4 border-b border-gray-200 font-bold text-right">Total Décaissé</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 border-b border-gray-100 font-medium text-gray-900">
+                      {row.account_name}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-100 text-right text-emerald-600 font-bold whitespace-nowrap">
+                      {Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(row.total_encaisse)}
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-100 text-right text-red-600 font-bold whitespace-nowrap">
+                      {Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(row.total_decaisse_positif)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
