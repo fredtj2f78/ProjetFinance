@@ -1,86 +1,39 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import Head from 'next/head';
-import Link from 'next/link';
+import React from 'react';
 
-export default function GuideInvestisseur({ articles }) {
+export default function GuideInvestisseur() {
+  const articles = [
+    { title: "SCI à l'IS vs LMNP Réel", category: "Fiscalité", slug: "/guide-investisseur/sci-is-vs-lmnp-reel-2025" },
+  ];
+
   return (
-    <>
-      <Head>
-        <title>Guide Investisseur | Analyses & Stratégies - Audit Immo</title>
-        <meta name="description" content="Découvrez nos analyses détaillées et nos comparatifs fiscaux pour maximiser la rentabilité de vos projets immobiliers." />
-      </Head>
+    <main className="max-w-6xl mx-auto px-4 py-12">
+      <div className="flex justify-between items-center mb-12">
+        <a href="/app" className="text-blue-600 font-bold hover:underline">← Retour à Audit Immo</a>
+      </div>
+      <header className="mb-16 text-center">
+        <h1 className="text-4xl font-bold mb-4">Guide Investisseur : Analyses & Stratégies</h1>
+        <p className="text-xl text-gray-600">Décryptez la fiscalité et optimisez vos cash-flows avec précision.</p>
+      </header>
 
-      <main style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-        <h1 style={{ fontSize: '2rem', borderBottom: '2px solid #eaeaea', paddingBottom: '10px' }}>
-          Guide Investisseur : Analyses & Stratégies
-        </h1>
-        <p style={{ color: '#666', marginBottom: '40px' }}>
-          Retrouvez ici nos dossiers experts pour décrypter la fiscalité, optimiser vos cash-flows nets et structurer votre patrimoine avec précision.
-        </p>
+      <section className="bg-blue-50 p-8 rounded-2xl mb-16">
+        <h2 className="text-2xl font-semibold mb-6">Par où commencer ?</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+            <h3 className="font-bold mb-2">Calculer sa rentabilité</h3>
+            <p className="text-sm text-gray-500 mb-4">Comprendre le rendement net net.</p>
+          </div>
+        </div>
+      </section>
 
-        <section style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* La boucle magique qui crée une carte pour chaque fichier .md */}
-          {articles.map((article) => (
-            <article key={article.slug} style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px' }}>
-              <h2 style={{ marginTop: '0', fontSize: '1.5rem' }}>
-                <Link href={`/guide-investisseur/${article.slug}`} style={{ textDecoration: 'none', color: '#0070f3' }}>
-                  {article.title}
-                </Link>
-              </h2>
-              <p style={{ fontSize: '0.9rem', color: '#888', marginBottom: '10px', fontStyle: 'italic' }}>
-                Publié le {article.date}
-              </p>
-              <p style={{ color: '#444' }}>
-                {article.description}
-              </p>
-              <Link href={`/guide-investisseur/${article.slug}`} style={{ fontWeight: 'bold', color: '#0070f3' }}>
-                Lire l'analyse complète →
-              </Link>
-            </article>
-          ))}
-        </section>
-      </main>
-    </>
+      <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {articles.map((art, index) => (
+          <article key={index} className="border-b pb-6">
+            <span className="text-xs text-blue-600 font-bold uppercase tracking-wider">{art.category}</span>
+            <h2 className="text-lg font-semibold my-2">{art.title}</h2>
+            <a href={art.slug} className="text-sm font-semibold hover:underline">Lire l'analyse →</a>
+          </article>
+        ))}
+      </section>
+    </main>
   );
 }
-
-// Cette fonction s'exécute côté serveur pour lire tes fichiers .md
-export async function getStaticProps() {
-  const articlesDirectory = path.join(process.cwd(), 'articles');
-  
-  // On vérifie si le dossier existe pour éviter une erreur
-  if (!fs.existsSync(articlesDirectory)) {
-    return { props: { articles: [] } };
-  }
-
-  const filenames = fs.readdirSync(articlesDirectory);
-
-  const articles = filenames.map((filename) => {
-    // On enlève le ".md" pour créer l'URL (le slug)
-    const slug = filename.replace(/\.md$/, '');
-
-    // On lit le contenu du fichier
-    const fullPath = path.join(articlesDirectory, filename);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-
-    // On extrait le titre, la date et la description du haut du fichier
-    const matterResult = matter(fileContents);
-
-    return {
-      ...matterResult.data,
-      slug,
-    };
-  });
-
-  // On trie les articles du plus récent au plus ancien
-  const sortedArticles = articles.sort((a, b) => (a.date < b.date ? 1 : -1));
-
-  return {
-    props: {
-      articles: sortedArticles,
-    },
-  };
-}
-

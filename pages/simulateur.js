@@ -433,7 +433,7 @@ useEffect(()=>{
  const toggle = useCallback((id,forceTo)=>setBlocks(prev=>({...prev,[id]:forceTo!==undefined?forceTo:!prev[id]})),[])
  const show = id=>blocks[id]
 
- const setPrixAchat = useCallback(v=>setP(prev=>({...prev,prixAchat:v,notaire:prev.notaireManuel?prev.notaire:Math.round(v*0.08)})),[])
+ const setPrixAchat = useCallback(v=>{ if(!v||isNaN(v)) return; setP(prev=>({...prev,prixAchat:v,notaire:prev.notaireManuel?prev.notaire:Math.round(v*0.08)})) },[])
  const chasseurHT = Math.round(p.chasseurTTC/1.2)
  const chasseurTVA = p.chasseurTTC - chasseurHT
  const prixReventeAuto = Math.round(p.prixAchat*Math.pow(1+p.revaloValeur,p.anCession))
