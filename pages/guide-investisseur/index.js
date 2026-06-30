@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
+
 const ARTICLES = [
   {
     ref: '10',
@@ -115,8 +116,8 @@ export default function GuideInvestisseur() {
       <main style={{ maxWidth: '880px', margin: '0 auto', padding: '0 24px 96px' }}>
         {/* Nav */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '28px 0', borderBottom: '1px solid #1C1F27' }}>
-          <a href="/app" style={{ color: '#8B8F99', fontSize: '13px', textDecoration: 'none', letterSpacing: '0.02em' }}>
-            ← Retour à Audit Immo
+            <a href="/" className="text-blue-600 font-bold hover:underline">← Retour à J2F Conseil</a>
+← Retour à Audit Immo
           </a>
           <span className="ref-mono" style={{ fontSize: '11px', color: '#4A4E5A', letterSpacing: '0.1em' }}>J2F CONSEIL</span>
         </div>
