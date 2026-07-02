@@ -256,12 +256,17 @@ export default function Landing() {
     <div style={{ background: G.bg, minHeight: '100vh', fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", color: G.text, overflowX: 'hidden' }}>
 
       {/* NAV */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? 'rgba(5,8,15,0.96)' : 'transparent', backdropFilter: scrolled ? 'blur(20px)' : 'none', borderBottom: `1px solid ${scrolled ? 'rgba(201,168,76,0.12)' : 'transparent'}`, transition: 'all 0.3s', padding: '0 40px', height: 62, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ background: '#FFCD00', borderRadius: 8, padding: '2px 6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><img src="/logo.png" alt="SimuImmo" style={{ width: 48, height: 40, objectFit: 'contain' }} /></div>
-          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: -0.5 }}>SimuImmo</span>
-          <span style={{ fontSize: 10, color: G.gold, background: `${G.gold}18`, border: `1px solid ${G.gold}33`, padding: '1px 6px', borderRadius: 4 }}>v29</span>
-        </div>
+     
+        <a href="https://www.j2f-conseil.fr/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', cursor: 'pointer' }}>
+  <div style={{ background: '#FFCD00', borderRadius: 8, padding: '2px 6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><img src="/logo.png" alt="SimuImmo" style={{ width: 48, height: 40, objectFit: 'contain' }} /></div>
+  <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: -0.5, color: G.text }}>SimuImmo</span>
+  <span style={{ fontSize: 10, color: G.gold, background: `${G.gold}18`, border: `1px solid ${G.gold}33`, padding: '1px 6px', borderRadius: 4 }}>v29</span>
+</a>
+
+
+        
+        
+        
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 <a href="/guide-investisseur" style={{ color: G.textDim, fontSize: 14, textDecoration: 'none' }}>Mes analyses</a>
 <a href="#features" style={{ color: G.textDim, fontSize: 14, textDecoration: 'none' }}>Fonctionnalités</a>
